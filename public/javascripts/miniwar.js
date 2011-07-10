@@ -23,7 +23,7 @@
       this.height = canvas.height;
       this.ctx = GameUtils.extended2DContext(this.canvas);
       this.player = new PlayablePlayer(this);
-      this.connection = new Connection();
+      this.connection = new Connection(this.player.id);
       this.connection.bind(__bind(function(message) {
         return this.handleMessage(message.type, message.data);
       }, this));
@@ -79,11 +79,25 @@
       this.players.push(player);
       return player;
     };
+    MiniWar.prototype.removePlayer = function(id) {
+      var newPlayers, player, _i, _len, _ref;
+      newPlayers = [];
+      _ref = this.players;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        player = _ref[_i];
+        if (id !== player.id) {
+          newPlayers.push(player);
+        }
+      }
+      return this.players = newPlayers;
+    };
     MiniWar.prototype.handleMessage = function(type, data) {
       var player;
       if (type === "player_updated") {
         player = this.findOrCreatePlayer(data.id);
         return player.update(data);
+      } else if (type === "player_quit") {
+        return this.removePlayer(data);
       }
     };
     return MiniWar;

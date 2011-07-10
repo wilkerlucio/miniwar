@@ -18,31 +18,13 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-host = location.href.match(/:\/\/([^:\/]+)/)[1]
+module MiniWar
+  class Player
+    attr_reader :id, :socket
 
-class Connection
-  constructor: (@id) ->
-    @socket = new WebSocket("ws://#{host}:8080")
-    @socket.onmessage = (message) => @dispatch(JSON.parse(message.data))
-    @binds = []
-    @connected = false
-
-  bind: (callback) -> @binds.push(callback)
-  dispatch: (data) ->
-    if data.type == "id_request"
-      console.log("sending id")
-      @send('user_id', @id)
-    else if data.type == "connection_ok"
-      @connected = true
-      console.log("connection ok")
-    else
-      bind(data) for bind in @binds
-
-  send: (type, data) ->
-    return false unless @connected or type == "user_id"
-    message = {type: type, data: data}
-    message = JSON.stringify(message)
-
-    @socket.send(message)
-
-window.Connection = Connection
+    def initialize(socket, id)
+      @socket = socket
+      @id = id
+    end
+  end
+end

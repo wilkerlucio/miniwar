@@ -20,5 +20,6 @@
 
 module MiniWar
   autoload :FrontEnd, 'miniwar/front_end'
+  autoload :Player,   'miniwar/player'
   autoload :Server,   'miniwar/server'
 end

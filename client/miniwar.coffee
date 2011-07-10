@@ -88,9 +88,19 @@ class MiniWar
     @players.push(player)
     player
 
+  removePlayer: (id) ->
+    newPlayers = []
+
+    for player in @players
+      newPlayers.push(player) unless id == player.id
+
+    @players = newPlayers
+
   handleMessage: (type, data) ->
     if type == "player_updated"
       player = @findOrCreatePlayer(data.id)
       player.update(data)
+    else if type == "player_quit"
+      @removePlayer(data)
 
 window.MiniWar = MiniWar

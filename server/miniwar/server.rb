@@ -40,7 +40,7 @@ module MiniWar
 
     def connection_opened(socket)
       @clientSockets << socket
-      socket.send(JSON.stringify(:type => "id_request", :data => nil))
+      socket.send({:type => "id_request", :data => nil}.to_json)
     end
 
     def connection_message(socket, message)
@@ -49,24 +49,31 @@ module MiniWar
       else
         message = JSON.parse(message)
 
-        if message.type == "user_id"
-          @clients[socket] = Player.new(socket, message.data)
-          socket.send(JSON.stringify(:type => "connection_ok", :data => nil))
+        if message["type"] == "user_id"
+          @clients[socket] = Player.new(socket, message["data"])
+          puts "Connected player id #{message["data"]}"
+          socket.send({:type => "connection_ok", :data => nil}.to_json)
         else # not an registered user, ask for registration again
-          socket.send(JSON.stringify(:type => "id_request", :data => nil))
+          socket.send({:type => "id_request", :data => nil}.to_json)
         end
       end
     end
 
     def connection_closed(socket)
+      if client = @clients[socket]
+        broadcast({:type => "player_quit", :data => client.id}.to_json, socket)
+        puts "Player #{client.id} quit."
+        @clients[socket] = nil
+      end
+
       @clientSockets.delete(socket)
     end
 
     def broadcast(message, ignore_socket = nil)
-      @clientSockets.each do |client|
-        next if client == ignore_socket
+      @clients.each_pair do |socket, player|
+        next if socket == ignore_socket
 
-        client.send message
+        socket.send message
       end
     end
   end
