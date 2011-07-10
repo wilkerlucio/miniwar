@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>MiniWar</title>
+		<meta charset="utf-8" />
+		<style type="text/css">
+			body { margin: 0; }
+		</style>
+		<script src="/javascripts/jquery-1.6.2.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="/javascripts/core_extensions.js" type="text/javascript" charset="utf-8"></script>
+		<script src="/javascripts/fps_counter.js" type="text/javascript" charset="utf-8"></script>
+		<script src="/javascripts/connection.js" type="text/javascript" charset="utf-8"></script>
+		<script src="/javascripts/gameutils.js" type="text/javascript" charset="utf-8"></script>
+		<script src="/javascripts/keyboard.js" type="text/javascript" charset="utf-8"></script>
+		<script src="/javascripts/miniwar.js" type="text/javascript" charset="utf-8"></script>
+		<script src="/javascripts/map.js" type="text/javascript" charset="utf-8"></script>
+		<script src="/javascripts/maps.js" type="text/javascript" charset="utf-8"></script>
+		<script src="/javascripts/player.js" type="text/javascript" charset="utf-8"></script>
+		<script src="/javascripts/playable_player.js" type="text/javascript" charset="utf-8"></script>
+		<script src="/javascripts/cursor.js" type="text/javascript" charset="utf-8"></script>
+		<script src="/javascripts/bullet.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript">
+			window.onload = function() {
+				var game = new MiniWar(document.getElementById("game-canvas"));
+			};
+		</script>
+	</head>
+	<body>
+		<canvas id="game-canvas" width="600" height="600"></canvas>
+	</body>
+</html>
