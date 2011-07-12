@@ -45,7 +45,14 @@ module MiniWar
 
     def connection_message(socket, message)
       if @clients[socket]
-        broadcast(message, socket)
+        message = JSON.parse(message)
+        responder = "respond_message_#{message["type"]}"
+
+        if respond_to?(responder)
+          send(responder, message["data", message])
+        else
+          broadcast(message, socket)
+        end
       else
         message = JSON.parse(message)
 
@@ -76,5 +83,7 @@ module MiniWar
         socket.send message
       end
     end
+
+    private
   end
 end
