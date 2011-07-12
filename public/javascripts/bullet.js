@@ -11,6 +11,9 @@
     Bullet.prototype.draw = function(ctx, elapsed) {
       this.x += this.dx * MiniWar.BULLET_SPEED * elapsed;
       this.y += this.dy * MiniWar.BULLET_SPEED * elapsed;
+      return this.doDraw(ctx);
+    };
+    Bullet.prototype.doDraw = function(ctx) {
       ctx.fillStyle = MiniWar.BULLET_COLOR;
       ctx.beginPath();
       ctx.arc(this.x, this.y, MiniWar.BULLET_RADIUS, 0, Math.PI * 2, true);

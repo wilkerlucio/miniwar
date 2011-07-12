@@ -39,13 +39,16 @@ class Player
     ctx.strokeLine(@x, @y, @x + @dx * MiniWar.PLAYER_CANNON_RADIUS, @y + @dy * MiniWar.PLAYER_CANNON_RADIUS)
 
     # draw bullets
-    bullet.draw(ctx, elapsed) for bullet in @bullets
-    @bullets = @bullets.filter (bullet) -> bullet.isAlive()
+    @drawBullets(ctx, elapsed)
+
+  drawBullets: (ctx, elapsed) ->
+    Bullet.prototype.doDraw.call(bullet, ctx) for bullet in @bullets
 
   update: (data) ->
-    @x  = data.x
-    @y  = data.y
-    @dx = data.dx
-    @dy = data.dy
+    @x       = data.x
+    @y       = data.y
+    @dx      = data.dx
+    @dy      = data.dy
+    @bullets = data.bullets
 
 window.Player = Player

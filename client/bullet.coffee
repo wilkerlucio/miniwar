@@ -27,6 +27,9 @@ class Bullet
     @x += @dx * MiniWar.BULLET_SPEED * elapsed
     @y += @dy * MiniWar.BULLET_SPEED * elapsed
 
+    @doDraw(ctx)
+
+  doDraw: (ctx) ->
     ctx.fillStyle = MiniWar.BULLET_COLOR
 
     ctx.beginPath()

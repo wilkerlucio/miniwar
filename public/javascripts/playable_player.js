@@ -52,6 +52,17 @@
       ctx.fillCircle(this.x, this.y, MiniWar.PLAYER_RADIUS_SELF);
       return this.game.connection.send("player_updated", this.serialize());
     };
+    PlayablePlayer.prototype.drawBullets = function(ctx, elapsed) {
+      var bullet, _i, _len, _ref;
+      _ref = this.bullets;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        bullet = _ref[_i];
+        bullet.draw(ctx, elapsed);
+      }
+      return this.bullets = this.bullets.filter(function(bullet) {
+        return bullet.isAlive();
+      });
+    };
     PlayablePlayer.prototype.move = function(elapsed) {
       var speed;
       speed = MiniWar.PLAYER_SPEED * elapsed;
@@ -106,12 +117,27 @@
       }
     };
     PlayablePlayer.prototype.serialize = function() {
+      var b, bullets;
+      bullets = (function() {
+        var _i, _len, _ref, _results;
+        _ref = this.bullets;
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          b = _ref[_i];
+          _results.push({
+            x: b.x,
+            y: b.y
+          });
+        }
+        return _results;
+      }).call(this);
       return {
         id: this.id,
         x: this.x,
         y: this.y,
         dx: this.dx,
-        dy: this.dy
+        dy: this.dy,
+        bullets: bullets
       };
     };
     return PlayablePlayer;

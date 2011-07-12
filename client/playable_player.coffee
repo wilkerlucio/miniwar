@@ -55,6 +55,10 @@ class PlayablePlayer extends Player
 
     @game.connection.send("player_updated", @serialize())
 
+  drawBullets: (ctx, elapsed) ->
+    bullet.draw(ctx, elapsed) for bullet in @bullets
+    @bullets = @bullets.filter (bullet) -> bullet.isAlive()
+
   move: (elapsed) ->
     speed = MiniWar.PLAYER_SPEED * elapsed
 
@@ -91,6 +95,7 @@ class PlayablePlayer extends Player
     @bullets.push(new Bullet(@game, @x, @y, @dx, @dy)) unless @bullets.length == MiniWar.BULLET_MAX
 
   serialize: ->
-    {id: @id, x: @x, y: @y, dx: @dx, dy: @dy}
+    bullets = ({x: b.x, y: b.y} for b in @bullets)
+    {id: @id, x: @x, y: @y, dx: @dx, dy: @dy, bullets: bullets}
 
 window.PlayablePlayer = PlayablePlayer
