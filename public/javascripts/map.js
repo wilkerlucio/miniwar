@@ -1,10 +1,15 @@
 (function() {
   var Map;
   Map = (function() {
+    Map.TEAMS = {
+      'red': 1,
+      'blue': 2
+    };
     function Map(mapData) {
       this.mapData = mapData;
       this.draws = [];
       this.map = [];
+      this.teams = {};
       this.init();
     }
     Map.prototype.draw = function(ctx) {
@@ -23,8 +28,14 @@
       }
       return row[x];
     };
+    Map.prototype.positionForTeam = function(team) {
+      var teamArray, teamIndex;
+      teamIndex = Map.TEAMS[team];
+      teamArray = this.teams[teamIndex];
+      return teamArray.randomItem();
+    };
     Map.prototype.init = function() {
-      var bs, col, i, mapRow, row, tempCanvas, tempContext, x, y, _len, _len2, _ref, _ref2;
+      var bs, col, i, mapRow, row, tempCanvas, tempContext, x, y, _base, _len, _len2, _ref, _ref2;
       bs = 10;
       tempCanvas = document.createElement("canvas");
       tempCanvas.width = MiniWar.MAP_SIZE;
@@ -45,6 +56,10 @@
             }
             tempContext.fillRect(x * bs, y * bs, bs, bs);
           } else {
+            if (col !== ' ') {
+              (_base = this.teams)[col] || (_base[col] = []);
+              this.teams[col].push([x * bs, y * bs]);
+            }
             while (i-- > 0) {
               mapRow.push(false);
             }

@@ -21,7 +21,7 @@
 host = location.href.match(/:\/\/([^:\/]+)/)[1]
 
 class Connection
-  constructor: (@id) ->
+  constructor: (@id, @onconnect) ->
     @socket = new WebSocket("ws://#{host}:8080")
     @socket.onmessage = (message) => @dispatch(JSON.parse(message.data))
     @binds = []
@@ -34,6 +34,7 @@ class Connection
       @send('user_id', @id)
     else if data.type == "connection_ok"
       @connected = true
+      @onconnect()
       console.log("connection ok")
     else
       bind(data) for bind in @binds

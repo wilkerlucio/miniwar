@@ -3,8 +3,9 @@
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
   host = location.href.match(/:\/\/([^:\/]+)/)[1];
   Connection = (function() {
-    function Connection(id) {
+    function Connection(id, onconnect) {
       this.id = id;
+      this.onconnect = onconnect;
       this.socket = new WebSocket("ws://" + host + ":8080");
       this.socket.onmessage = __bind(function(message) {
         return this.dispatch(JSON.parse(message.data));
@@ -22,6 +23,7 @@
         return this.send('user_id', this.id);
       } else if (data.type === "connection_ok") {
         this.connected = true;
+        this.onconnect();
         return console.log("connection ok");
       } else {
         _ref = this.binds;

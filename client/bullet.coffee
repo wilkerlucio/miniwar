@@ -22,6 +22,7 @@ class Bullet
   constructor: (@game, x, y, @dx, @dy) ->
     @x = x + @dx * MiniWar.PLAYER_CANNON_RADIUS
     @y = y + @dy * MiniWar.PLAYER_CANNON_RADIUS
+    @hit = false
 
   draw: (ctx, elapsed) ->
     @x += @dx * MiniWar.BULLET_SPEED * elapsed
@@ -38,6 +39,8 @@ class Bullet
     ctx.fill()
 
   isAlive: ->
+    return false if @hit
+
     r = MiniWar.BULLET_RADIUS
     s = MiniWar.MAP_SIZE
 

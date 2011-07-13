@@ -46,6 +46,9 @@
       this.id = GameUtils.randomId();
     }
     PlayablePlayer.prototype.draw = function(ctx, elapsed) {
+      if (!this.live) {
+        return;
+      }
       this.move(elapsed);
       PlayablePlayer.__super__.draw.apply(this, arguments);
       ctx.fillStyle = '#000';
@@ -53,11 +56,23 @@
       return this.game.connection.send("player_updated", this.serialize());
     };
     PlayablePlayer.prototype.drawBullets = function(ctx, elapsed) {
-      var bullet, _i, _len, _ref;
+      var bullet, distance, lx, ly, player, _i, _j, _len, _len2, _ref, _ref2;
       _ref = this.bullets;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         bullet = _ref[_i];
         bullet.draw(ctx, elapsed);
+        _ref2 = this.game.players;
+        for (_j = 0, _len2 = _ref2.length; _j < _len2; _j++) {
+          player = _ref2[_j];
+          lx = bullet.x - player.x;
+          ly = bullet.y - player.y;
+          distance = Math.sqrt(lx * lx + ly * ly);
+          if (distance < MiniWar.BULLET_COLLISION_DISTANCE) {
+            bullet.hit = true;
+            this.game.connection.send("player_died", player.id);
+            player.live = false;
+          }
+        }
       }
       return this.bullets = this.bullets.filter(function(bullet) {
         return bullet.isAlive();
@@ -112,6 +127,9 @@
       return this.dy = Math.sin(angle);
     };
     PlayablePlayer.prototype.shot = function() {
+      if (!this.live) {
+        return;
+      }
       if (this.bullets.length !== MiniWar.BULLET_MAX) {
         return this.bullets.push(new Bullet(this.game, this.x, this.y, this.dx, this.dy));
       }
@@ -137,7 +155,8 @@
         y: this.y,
         dx: this.dx,
         dy: this.dy,
-        bullets: bullets
+        bullets: bullets,
+        team: this.team
       };
     };
     return PlayablePlayer;

@@ -19,9 +19,12 @@
 # THE SOFTWARE.
 
 class Map
+  @TEAMS = {'red': 1, 'blue': 2}
+
   constructor: (@mapData) ->
     @draws = []
     @map = []
+    @teams = {}
 
     @init()
 
@@ -38,6 +41,11 @@ class Map
     return false unless row
 
     return row[x]
+
+  positionForTeam: (team) ->
+    teamIndex = Map.TEAMS[team]
+    teamArray = @teams[teamIndex]
+    teamArray.randomItem()
 
   init: ->
     bs = 10 # block size
@@ -59,6 +67,10 @@ class Map
           mapRow.push(true) while i-- > 0
           tempContext.fillRect(x * bs, y * bs, bs, bs)
         else
+          unless col == ' '
+            @teams[col] ||= []
+            @teams[col].push([x * bs, y * bs])
+
           mapRow.push(false) while i-- > 0
 
       i = bs

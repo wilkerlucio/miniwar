@@ -7,6 +7,7 @@
       this.dy = dy;
       this.x = x + this.dx * MiniWar.PLAYER_CANNON_RADIUS;
       this.y = y + this.dy * MiniWar.PLAYER_CANNON_RADIUS;
+      this.hit = false;
     }
     Bullet.prototype.draw = function(ctx, elapsed) {
       this.x += this.dx * MiniWar.BULLET_SPEED * elapsed;
@@ -22,6 +23,9 @@
     };
     Bullet.prototype.isAlive = function() {
       var r, s;
+      if (this.hit) {
+        return false;
+      }
       r = MiniWar.BULLET_RADIUS;
       s = MiniWar.MAP_SIZE;
       if (this.x < 0) {

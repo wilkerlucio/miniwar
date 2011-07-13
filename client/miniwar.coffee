@@ -19,20 +19,23 @@
 # THE SOFTWARE.
 
 class MiniWar
-  @MAP_SIZE             = 600
-  @BACKGROUND_COLOR     = "#7cce66"
-  @BRICK_COLOR          = "#908e8c"
-  @PLAYER_COLOR         = "#886f31"
-  @PLAYER_RADIUS        = 6
-  @PLAYER_RADIUS_SELF   = 3
-  @PLAYER_CANNON_RADIUS = 10
-  @PLAYER_CANNON_HEIGHT = 4
-  @PLAYER_SPEED         = 0.1
-  @BULLET_COLOR         = "#000000"
-  @BULLET_SPEED         = 0.4
-  @BULLET_RADIUS        = 2
-  @BULLET_MAX           = 3
-  @CURSOR_SIZE          = 3
+  @MAP_SIZE                  = 600
+  @BACKGROUND_COLOR          = "#7cce66"
+  @BRICK_COLOR               = "#908e8c"
+  @PLAYER_COLOR              = "#886f31"
+  @PLAYER_RED_COLOR          = "#f00"
+  @PLAYER_BLUE_COLOR         = "#00f"
+  @PLAYER_RADIUS             = 6
+  @PLAYER_RADIUS_SELF        = 3
+  @PLAYER_CANNON_RADIUS      = 10
+  @PLAYER_CANNON_HEIGHT      = 4
+  @PLAYER_SPEED              = 0.1
+  @BULLET_COLOR              = "#000000"
+  @BULLET_SPEED              = 0.4
+  @BULLET_RADIUS             = 2
+  @BULLET_MAX                = 3
+  @BULLET_COLLISION_DISTANCE = @BULLET_RADIUS + @PLAYER_RADIUS
+  @CURSOR_SIZE               = 3
 
   constructor: (@canvas) ->
     @canvas.style.cursor = "none" # hide original cursor
@@ -41,12 +44,19 @@ class MiniWar
     @height     = canvas.height
     @ctx        = GameUtils.extended2DContext(@canvas)
     @player     = new PlayablePlayer(this)
-    @connection = new Connection(@player.id)
+
+    @drawConnecting()
+
+    @connection = new Connection(@player.id, (=>
+      @newGame()
+      @startGameLoop()
+    ))
 
     @connection.bind (message) => @handleMessage(message.type, message.data)
 
-    @newGame()
-    @startGameLoop()
+  drawConnecting: ->
+    @ctx.fillStyle = '#000'
+    @ctx.fillText("Connecting to server...", 100, 100)
 
   startGameLoop: ->
     @lastTime = Date.currentTime()
@@ -85,8 +95,16 @@ class MiniWar
 
     player = new Player(this)
     player.id = id
+    player.live = true
     @players.push(player)
     player
+
+  killPlayer: (id) ->
+    if id == @player.id
+      @player.live = false
+    else
+      for player in @players
+        player.live = false if player.id == id
 
   removePlayer: (id) ->
     newPlayers = []
@@ -100,6 +118,17 @@ class MiniWar
     if type == "player_updated"
       player = @findOrCreatePlayer(data.id)
       player.update(data)
+    else if type == "player_died"
+      @killPlayer(data)
+    else if type == "assign_team"
+      @player.team = data
+      position = @map.positionForTeam(data)
+      @player.x = position[0]
+      @player.y = position[1]
+    else if type == "start_game"
+      @player.live = true
+      @player.bullets = []
+      player.live = true for player in @players
     else if type == "player_quit"
       @removePlayer(data)
 

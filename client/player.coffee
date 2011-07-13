@@ -20,16 +20,20 @@
 
 class Player
   constructor: (@game) ->
+    @live    = false
     @x       = 50
     @y       = 50
     @dx      = Math.cos(0)
     @dy      = Math.sin(0)
     @bullets = []
+    @team    = null
 
   draw: (ctx, elapsed) ->
+    return unless @live
     # setup drawing
-    ctx.strokeStyle = MiniWar.PLAYER_COLOR
-    ctx.fillStyle   = MiniWar.PLAYER_COLOR
+    color = if @team then MiniWar["PLAYER_#{@team.toUpperCase()}_COLOR"] else MiniWar.PLAYER_COLOR
+    ctx.strokeStyle = color
+    ctx.fillStyle   = color
     ctx.lineWidth   = MiniWar.PLAYER_CANNON_HEIGHT
 
     # draw player circle
@@ -50,5 +54,6 @@ class Player
     @dx      = data.dx
     @dy      = data.dy
     @bullets = data.bullets
+    @team    = data.team
 
 window.Player = Player

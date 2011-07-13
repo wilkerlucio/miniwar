@@ -13,4 +13,9 @@
     }
     return newArray;
   };
+  Array.prototype.randomItem = function() {
+    var index;
+    index = Math.floor(Math.random() * this.length);
+    return this[index];
+  };
 }).call(this);

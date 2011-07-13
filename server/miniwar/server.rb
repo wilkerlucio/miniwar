@@ -23,6 +23,8 @@ require 'json'
 
 module MiniWar
   class Server
+    MIN_PLAYERS = 2
+
     def self.start(options)
       server = self.new
 
@@ -36,6 +38,7 @@ module MiniWar
     def initialize
       @clientSockets = []
       @clients = {}
+      @state = :waiting
     end
 
     def connection_opened(socket)
@@ -43,23 +46,21 @@ module MiniWar
       socket.send({:type => "id_request", :data => nil}.to_json)
     end
 
-    def connection_message(socket, message)
-      if @clients[socket]
-        message = JSON.parse(message)
-        responder = "respond_message_#{message["type"]}"
+    def connection_message(socket, message_string)
+      message = JSON.parse(message_string)
 
-        if respond_to?(responder)
-          send(responder, message["data", message])
+      if @clients[socket]
+        if message["type"] == "player_died"
+          respond_message_player_died(message["data"], message_string, socket)
         else
-          broadcast(message, socket)
+          broadcast(message_string, socket)
         end
       else
-        message = JSON.parse(message)
-
         if message["type"] == "user_id"
           @clients[socket] = Player.new(socket, message["data"])
           puts "Connected player id #{message["data"]}"
           socket.send({:type => "connection_ok", :data => nil}.to_json)
+          start_game
         else # not an registered user, ask for registration again
           socket.send({:type => "id_request", :data => nil}.to_json)
         end
@@ -70,7 +71,8 @@ module MiniWar
       if client = @clients[socket]
         broadcast({:type => "player_quit", :data => client.id}.to_json, socket)
         puts "Player #{client.id} quit."
-        @clients[socket] = nil
+        @clients.delete(socket)
+        check_game_status
       end
 
       @clientSockets.delete(socket)
@@ -85,5 +87,66 @@ module MiniWar
     end
 
     private
+
+    def respond_message_player_died(id, message, socket)
+      puts "killed player #{id}"
+
+      @clients.each_pair do |socket, player|
+        if player.id == id
+          puts "real killed player #{id}"
+          player.live = false
+        end
+      end
+
+      broadcast(message, socket)
+
+      check_game_status
+    end
+
+    def start_game
+      return if @clients.length < MIN_PLAYERS
+      return if @state == :running
+
+      @state = :running
+
+      assign_teams
+
+      @clients.each_pair do |socket, client|
+        client.live = true
+        client.send_message("start_game")
+      end
+
+      puts "New round started"
+    end
+
+    def check_game_status
+      reds = 0
+      blues = 0
+
+      @clients.each_pair do |socket, client|
+        if client.live
+          reds += 1 if client.team == :red
+          blues += 1 if client.team == :blue
+        end
+      end
+
+      puts "reds: #{reds}, blues: #{blues}"
+
+      if reds == 0 or blues == 0
+        puts "Round finished, starting new one"
+        @state = :waiting
+        start_game
+      end
+    end
+
+    def assign_teams
+      team = :red
+
+      @clients.each_pair do |socket, client|
+        client.team = team
+        client.send_message("assign_team", team)
+        team = team == :red ? :blue : :red
+      end
+    end
   end
 end

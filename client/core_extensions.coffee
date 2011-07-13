@@ -20,10 +20,14 @@
 
 Date.currentTime = -> (new Date()).getTime()
 
-Array.prototype.filter = (iterator) ->
+Array::filter = (iterator) ->
   newArray = []
 
   for item in this
     newArray.push(item) if iterator(item)
 
   newArray
+
+Array::randomItem = ->
+  index = Math.floor(Math.random() * this.length)
+  this[index]

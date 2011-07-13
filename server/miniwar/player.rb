@@ -21,10 +21,16 @@
 module MiniWar
   class Player
     attr_reader :id, :socket
+    attr_accessor :team, :live
 
     def initialize(socket, id)
       @socket = socket
       @id = id
+      @live = false
+    end
+
+    def send_message(type, data = nil)
+      @socket.send({:type => type, :data => data}.to_json)
     end
   end
 end

@@ -45,6 +45,8 @@ class PlayablePlayer extends Player
     @id = GameUtils.randomId()
 
   draw: (ctx, elapsed) ->
+    return unless @live
+
     @move(elapsed)
 
     super
@@ -56,7 +58,19 @@ class PlayablePlayer extends Player
     @game.connection.send("player_updated", @serialize())
 
   drawBullets: (ctx, elapsed) ->
-    bullet.draw(ctx, elapsed) for bullet in @bullets
+    for bullet in @bullets
+      bullet.draw(ctx, elapsed)
+
+      for player in @game.players
+        lx = bullet.x - player.x
+        ly = bullet.y - player.y
+        distance = Math.sqrt(lx * lx + ly * ly)
+
+        if distance < MiniWar.BULLET_COLLISION_DISTANCE
+          bullet.hit = true
+          @game.connection.send("player_died", player.id)
+          player.live = false
+
     @bullets = @bullets.filter (bullet) -> bullet.isAlive()
 
   move: (elapsed) ->
@@ -92,10 +106,12 @@ class PlayablePlayer extends Player
     @dy = Math.sin(angle)
 
   shot: ->
+    return unless @live
+
     @bullets.push(new Bullet(@game, @x, @y, @dx, @dy)) unless @bullets.length == MiniWar.BULLET_MAX
 
   serialize: ->
     bullets = ({x: b.x, y: b.y} for b in @bullets)
-    {id: @id, x: @x, y: @y, dx: @dx, dy: @dy, bullets: bullets}
+    {id: @id, x: @x, y: @y, dx: @dx, dy: @dy, bullets: bullets, team: @team}
 
 window.PlayablePlayer = PlayablePlayer

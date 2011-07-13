@@ -3,15 +3,22 @@
   Player = (function() {
     function Player(game) {
       this.game = game;
+      this.live = false;
       this.x = 50;
       this.y = 50;
       this.dx = Math.cos(0);
       this.dy = Math.sin(0);
       this.bullets = [];
+      this.team = null;
     }
     Player.prototype.draw = function(ctx, elapsed) {
-      ctx.strokeStyle = MiniWar.PLAYER_COLOR;
-      ctx.fillStyle = MiniWar.PLAYER_COLOR;
+      var color;
+      if (!this.live) {
+        return;
+      }
+      color = this.team ? MiniWar["PLAYER_" + (this.team.toUpperCase()) + "_COLOR"] : MiniWar.PLAYER_COLOR;
+      ctx.strokeStyle = color;
+      ctx.fillStyle = color;
       ctx.lineWidth = MiniWar.PLAYER_CANNON_HEIGHT;
       ctx.fillCircle(this.x, this.y, MiniWar.PLAYER_RADIUS);
       ctx.strokeLine(this.x, this.y, this.x + this.dx * MiniWar.PLAYER_CANNON_RADIUS, this.y + this.dy * MiniWar.PLAYER_CANNON_RADIUS);
@@ -32,7 +39,8 @@
       this.y = data.y;
       this.dx = data.dx;
       this.dy = data.dy;
-      return this.bullets = data.bullets;
+      this.bullets = data.bullets;
+      return this.team = data.team;
     };
     return Player;
   })();
