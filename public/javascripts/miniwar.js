@@ -7,7 +7,7 @@
     MiniWar.BRICK_COLOR = "#908e8c";
     MiniWar.PLAYER_COLOR = "#886f31";
     MiniWar.PLAYER_RED_COLOR = "#f00";
-    MiniWar.PLAYER_BLUE_COLOR = "#00f";
+    MiniWar.PLAYER_BLUE_COLOR = "#55f";
     MiniWar.PLAYER_RADIUS = 6;
     MiniWar.PLAYER_RADIUS_SELF = 3;
     MiniWar.PLAYER_CANNON_RADIUS = 10;

@@ -24,7 +24,7 @@ class MiniWar
   @BRICK_COLOR               = "#908e8c"
   @PLAYER_COLOR              = "#886f31"
   @PLAYER_RED_COLOR          = "#f00"
-  @PLAYER_BLUE_COLOR         = "#00f"
+  @PLAYER_BLUE_COLOR         = "#55f"
   @PLAYER_RADIUS             = 6
   @PLAYER_RADIUS_SELF        = 3
   @PLAYER_CANNON_RADIUS      = 10
