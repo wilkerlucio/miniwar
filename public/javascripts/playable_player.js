@@ -64,6 +64,9 @@
         _ref2 = this.game.players;
         for (_j = 0, _len2 = _ref2.length; _j < _len2; _j++) {
           player = _ref2[_j];
+          if (!player.live) {
+            continue;
+          }
           lx = bullet.x - player.x;
           ly = bullet.y - player.y;
           distance = Math.sqrt(lx * lx + ly * ly);

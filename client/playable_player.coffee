@@ -62,6 +62,8 @@ class PlayablePlayer extends Player
       bullet.draw(ctx, elapsed)
 
       for player in @game.players
+        continue unless player.live
+
         lx = bullet.x - player.x
         ly = bullet.y - player.y
         distance = Math.sqrt(lx * lx + ly * ly)
